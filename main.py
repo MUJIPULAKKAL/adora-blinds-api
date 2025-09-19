@@ -5,9 +5,15 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 app = FastAPI()
+# Root endpoint
 @app.get("/")
 def root():
     return {"message": "🚀 Adora Blinds API is running on Vercel!"}
+
+# Health-check endpoint
+@app.get("/ping")
+def ping():
+    return {"status": "ok", "message": "pong"}    
 # Load credentials from Vercel Environment Variables
 sa_json = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]   # full JSON string
 SHEET_ID = os.environ["SHEET_ID"]                     # Sheet ID
@@ -63,4 +69,5 @@ def calculate(req: OrderRequest):
         "vat": vat,
         "total": total
     }
+
 
