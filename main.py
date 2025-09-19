@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from fastapi import Depends, Header, HTTPException
+
 
 app = FastAPI()
 # Root endpoint
@@ -14,6 +16,11 @@ def root():
 @app.get("/ping")
 def ping():
     return {"status": "ok", "message": "pong"}    
+# API Key verification
+def verify_api_key(x_api_key: str = Header(...)):
+    expected_key = os.environ.get("API_KEY")
+    if x_api_key != expected_key:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 # Load credentials from Vercel Environment Variables
 sa_json = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]   # full JSON string
 SHEET_ID = os.environ["SHEET_ID"]                     # Sheet ID
@@ -36,7 +43,7 @@ class OrderRequest(BaseModel):
 
 # 🔹 API endpoint
 @app.post("/calculate")
-def calculate(req: OrderRequest):
+def calculate(req: OrderRequest, auth: str = Depends(verify_api_key)):
     if req.clear:
         sheet.batch_clear(["A2:G"])  # clear old rows
 
@@ -69,5 +76,6 @@ def calculate(req: OrderRequest):
         "vat": vat,
         "total": total
     }
+
 
 
