@@ -48,7 +48,7 @@ def calculate(req: OrderRequest, auth: str = Depends(verify_api_key)):
         sheet.batch_clear(["A2:G"])  # clear old rows
 
     total_area = 0
-    unit_price = 39.0
+    unit_price = 40.0
     lines = []
 
     for item in req.items:
@@ -76,6 +76,7 @@ def calculate(req: OrderRequest, auth: str = Depends(verify_api_key)):
         "vat": vat,
         "total": total
     }
+
 
 
 
